@@ -56,8 +56,8 @@ class _PeripheralSelectedScreenState extends State<PeripheralSelectedScreen> {
       _handlePairingStateChange,
     );
 
-    // UniversalBle.onValueChange = _handleValueChange;
-    UniversalBle.onValueChange = _handleValueChange as OnValueChange?;
+    UniversalBle.onValueChange = _handleValueChange;
+    // UniversalBle.onValueChange = _handleValueChange as OnValueChange?;
 
     _asyncInits();
   }
@@ -135,6 +135,9 @@ class _PeripheralSelectedScreenState extends State<PeripheralSelectedScreen> {
                               child: _showExtraCommand(),
                             ),
                           ),
+                          Flexible(
+                            child: SingleChildScrollView(child: _showNusCmd()),
+                          ),
                           Expanded(child: _logInfo()),
                         ],
                       ),
@@ -146,6 +149,58 @@ class _PeripheralSelectedScreenState extends State<PeripheralSelectedScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  final List<bool> _selectedLeds = <bool>[false, false, false];
+  List<Widget> leds = <Widget>[Text('RED'), Text('GREEN'), Text('BLUE')];
+
+  _showNusCmd() {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 247, 204, 204),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          myWIDTH(10),
+          ToggleButtons(
+            direction: Axis.horizontal,
+            onPressed: (int index) {
+              // All buttons are selectable.
+              setState(() {
+                _selectedLeds[index] = !_selectedLeds[index];
+                String cmd = '0001${index.toString().padLeft(2, '0')}';
+                cmd += _selectedLeds[index] ? '01' : '00';
+
+                _writeNusMsg(selectedCharacteristic, cmd, withResponse: false);
+              });
+              for (int i = 0; i < _selectedLeds.length; i++) {
+                if (_selectedLeds[i] == true) {
+                  myUtils.log("Selected ${leds[i].toString()}");
+                }
+              }
+            },
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            selectedBorderColor: Colors.green[700],
+            selectedColor: Colors.white,
+            fillColor: Colors.green[200],
+            color: Colors.green[400],
+            constraints: const BoxConstraints(minHeight: 40.0, minWidth: 80.0),
+            isSelected: _selectedLeds,
+            children: leds,
+          ),
+        ],
+      ),
     );
   }
 
@@ -825,5 +880,35 @@ class _PeripheralSelectedScreenState extends State<PeripheralSelectedScreen> {
     });
     // Scroll to the bottom after adding new content
     _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+  }
+
+  Future<void> _writeNusMsg(
+    BleCharacteristic? character,
+    String binCode, {
+    required bool withResponse,
+  }) async {
+    if (character == null ||
+        // !valueFormKey.currentState!.validate() ||
+        binCode.isEmpty) {
+      return;
+    }
+
+    Uint8List value;
+    try {
+      value = Uint8List.fromList(hex.decode(binCode));
+      _addLog("Write value $value", true);
+    } catch (e) {
+      _addLog('WriteError', "Error parsing hex $e");
+      myUtils.e("${userFunc()} : $e");
+      return;
+    }
+
+    try {
+      _addLog('Write${withResponse ? "" : "WithoutResponse"}', value);
+      await character.write(value, withResponse: withResponse);
+    } catch (e) {
+      debugPrint(e.toString());
+      _addLog('WriteError', e);
+    }
   }
 }

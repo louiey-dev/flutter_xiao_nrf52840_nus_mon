@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_xiao_nrf52840_nus_mon/screen/ble/ble_scan.dart';
+import 'package:flutter_xiao_nrf52840_nus_mon/screen/universal_ble_win/ble_screen.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/tab_menu_screen.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/wifi/wifi_screen.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/xterm/xterm_screen.dart';
@@ -27,9 +27,9 @@ class _MultiSplitViewScreenState extends State<MultiSplitViewScreen> {
         Area(
           flex: 3,
           builder: (context, area) => MultiSplitView(
-            onDividerDragUpdate: _onDividerDragUpdate,
-            onDividerTap: _onDividerTap,
-            onDividerDoubleTap: _onDividerDoubleTap,
+            // onDividerDragUpdate: _onDividerDragUpdate,
+            // onDividerTap: _onDividerTap,
+            // onDividerDoubleTap: _onDividerDoubleTap,
             initialAreas: [
               Area(
                 builder: (context, area) => Container(
@@ -39,7 +39,7 @@ class _MultiSplitViewScreenState extends State<MultiSplitViewScreen> {
               ),
               Area(
                 builder: (context, area) =>
-                    Container(color: Colors.yellow, child: BleScanScreen()),
+                    Container(color: Colors.yellow, child: BleScreen()),
               ),
               Area(
                 builder: (context, area) =>
@@ -52,7 +52,7 @@ class _MultiSplitViewScreenState extends State<MultiSplitViewScreen> {
           // flex: 1,
           size: 140.0,
           builder: (context, area) =>
-              Container(color: Colors.orange, child: TabMenuScreen()),
+              Container(color: Colors.white60, child: TabMenuScreen()),
         ),
       ],
     );
@@ -84,27 +84,27 @@ class _MultiSplitViewScreenState extends State<MultiSplitViewScreen> {
     );
   }
 
-  _onDividerDragUpdate(int index) {
-    if (kDebugMode) {
-      print('drag update: $index');
-    }
-  }
+  // _onDividerDragUpdate(int index) {
+  //   if (kDebugMode) {
+  //     print('drag update: $index');
+  //   }
+  // }
 
-  _onDividerDoubleTap(int dividerIndex) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 1),
-        content: Text("Double tap on divider: $dividerIndex"),
-      ),
-    );
-  }
+  // _onDividerDoubleTap(int dividerIndex) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       duration: const Duration(seconds: 1),
+  //       content: Text("Double tap on divider: $dividerIndex"),
+  //     ),
+  //   );
+  // }
 
-  _onDividerTap(int dividerIndex) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 1),
-        content: Text("Tap on divider: $dividerIndex"),
-      ),
-    );
-  }
+  // _onDividerTap(int dividerIndex) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       duration: const Duration(seconds: 1),
+  //       content: Text("Tap on divider: $dividerIndex"),
+  //     ),
+  //   );
+  // }
 }

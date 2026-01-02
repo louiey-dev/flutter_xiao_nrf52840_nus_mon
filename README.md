@@ -6,14 +6,15 @@ Based code is from "flutter_xterm_uart_split_window"
 
 ## TODOs
 
-- Split window set up
-- Basic code prepare
+- ~~Split window set up~~
+- ~~Basic code prepare~~
 - Terminal feature
   - copy and paste window
   - keyboard input
+  - ~~COM port feature~~
 - BLE basic connection feature
-- universal_ble v1.0 apply
-  - some differences at code
+- ~~universal_ble v1.0 apply~~
+  - ~~some differences at code~~
 
 ## History
 
@@ -24,6 +25,9 @@ Based code is from "flutter_xterm_uart_split_window"
     - it works with xiao evm
   - need to consider new UI screen to control BLE NUS
     - bluetooth screen includes toggle buttons and it looks not good
+- 2026.01.02
+  - universal_ble v1.0 applied and LED control works
+  - Added API, _writeToBle, at ble menu tab and could use this for others
 
 ## Info
 

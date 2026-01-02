@@ -41,8 +41,36 @@ class _TabMenuScreenState extends State<TabMenuScreen>
       ],
       tabBarView: GFTabBarView(
         controller: tabController,
-        children: <Widget>[ComScreen(), BleMenu(), WiFiMenu()],
+        children: <Widget>[
+          KeepAliveWrapper(child: ComScreen()),
+          KeepAliveWrapper(child: BleMenu()),
+          KeepAliveWrapper(child: WiFiMenu()),
+        ],
       ),
     );
   }
+}
+
+// 2026-01-02 17:31, Louiey.
+// whenever switch tab, it lost state so added keep alive wrapper to keep state alive
+// so when i open com port and switch to ble tab, com tab disposed so com closed and need to reopen again and again
+class KeepAliveWrapper extends StatefulWidget {
+  final Widget child;
+
+  const KeepAliveWrapper({super.key, required this.child});
+
+  @override
+  State<KeepAliveWrapper> createState() => _KeepAliveWrapperState();
+}
+
+class _KeepAliveWrapperState extends State<KeepAliveWrapper>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }

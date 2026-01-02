@@ -32,16 +32,19 @@ class _MultiSplitViewScreenState extends State<MultiSplitViewScreen> {
             // onDividerDoubleTap: _onDividerDoubleTap,
             initialAreas: [
               Area(
+                flex: 2,
                 builder: (context, area) => Container(
                   color: Colors.lightBlueAccent,
                   child: _xtermScreen,
                 ),
               ),
               Area(
+                flex: 2,
                 builder: (context, area) =>
                     Container(color: Colors.yellow, child: BleScreen()),
               ),
               Area(
+                flex: 1,
                 builder: (context, area) =>
                     Container(color: Colors.green, child: WiFiScreen()),
               ),

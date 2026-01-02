@@ -81,7 +81,12 @@ class ServicesListWidget extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        service.uuid,
+                        // service.uuid,
+                        service.uuid.contains('1800')
+                            ? '${service.uuid} -- GAP'
+                            : service.uuid.contains('1801')
+                            ? '${service.uuid} -- GATT'
+                            : service.uuid,
                         style: TextStyle(
                           fontSize: 13,
                           fontFamily: 'monospace',

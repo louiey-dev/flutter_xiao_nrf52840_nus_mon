@@ -28,6 +28,7 @@ Based code is from "flutter_xterm_uart_split_window"
 - 2026.01.02
   - universal_ble v1.0 applied and LED control works
   - Added API, _writeToBle, at ble menu tab and could use this for others
+  - Display GAP/GATT string when prints service info
 
 ## Info
 

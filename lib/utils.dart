@@ -99,7 +99,7 @@ class MyUtils {
 
   void showSnackbarError(BuildContext context, String msg) {
     final snackBar = SnackBar(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
       content: Text(msg),
       backgroundColor: Colors.red,
       action: SnackBarAction(

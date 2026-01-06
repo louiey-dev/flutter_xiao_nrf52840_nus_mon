@@ -31,6 +31,10 @@ class _BleMenuState extends State<BleMenu> {
     ),
   ];
 
+  double _currentSliderValue = 0.0;
+
+  TextEditingController prdController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -56,9 +60,9 @@ class _BleMenuState extends State<BleMenu> {
                   setState(() {
                     _selectedLeds[index] = !_selectedLeds[index];
 
-                    String cmd = '0001${index.toString().padLeft(2, '0')}';
+                    String cmd = '00010006${index.toString().padLeft(2, '0')}';
                     cmd += _selectedLeds[index] ? '01' : '00';
-                    _writeToBle(Uint8List.fromList(hex.decode(cmd)));
+                    _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
                   });
 
                   for (int i = 0; i < _selectedLeds.length; i++) {
@@ -79,6 +83,31 @@ class _BleMenuState extends State<BleMenu> {
                 isSelected: _selectedLeds,
                 children: rgbLeds,
               ),
+              myWIDTH(20),
+              _discreteSlider(),
+              myWIDTH(10),
+              SizedBox(
+                width: 130,
+                child: TextField(
+                  controller: prdController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'in msec',
+                    labelText: 'prd time',
+                    prefixIcon: Icon(Icons.timer),
+                  ),
+                ),
+              ),
+              myWIDTH(10),
+              ElevatedButton(
+                onPressed: () {
+                  int prd = int.parse(prdController.text);
+                  String cmd =
+                      '00040006${prd.toRadixString(16).padLeft(4, '0')}';
+                  _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+                },
+                child: const Text('Set'),
+              ),
             ],
           ),
         ],
@@ -86,17 +115,51 @@ class _BleMenuState extends State<BleMenu> {
     );
   }
 
-  Future<void> _writeToBle(Uint8List data) async {
+  _discreteSlider() {
+    return Row(
+      children: [
+        const Text('PWM LED Width', style: TextStyle(fontSize: 16)),
+        // const SizedBox(width: 10),
+        Slider(
+          value: _currentSliderValue,
+          min: 0,
+          max: 5000000, // 5 seconds
+          divisions: 100,
+          label: _currentSliderValue.round().toString(),
+          onChanged: (double value) {
+            setState(() {
+              _currentSliderValue = value;
+            });
+          },
+        ),
+        // const SizedBox(width: 10),
+        ElevatedButton(
+          onPressed: () {
+            String cmd =
+                '00030008${_currentSliderValue.toInt().toRadixString(16).padLeft(8, '0')}';
+            _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+          },
+          child: const Text("Set"),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _writeToBle(Uint8List data, bool withResponse) async {
     final characteristic = PeripheralDetailPage.globalSelectedCharacteristic;
     if (characteristic != null) {
       try {
-        await characteristic.write(data, withResponse: true);
+        await characteristic.write(data, withResponse: withResponse);
         myUtils.log("Wrote to BLE: $data");
       } catch (e) {
         myUtils.log("Error writing to BLE: $e");
       }
     } else {
       myUtils.log("No BLE Characteristic selected in Detail Page");
+      myUtils.showSnackbarError(
+        context,
+        "No BLE Characteristic selected in Detail Page",
+      );
     }
   }
 }

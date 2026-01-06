@@ -4,6 +4,7 @@ import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_xiao_nrf52840_nus_mon/feature/sensor_data.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/universal_ble_win/peripheral_details/responsive_view.dart';
 import 'package:universal_ble/universal_ble.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/universal_ble_win/data/storage_service.dart';
@@ -15,6 +16,9 @@ class PeripheralDetailPage extends StatefulWidget {
   final BleDevice bleDevice;
   const PeripheralDetailPage(this.bleDevice, {super.key});
   static BleCharacteristic? globalSelectedCharacteristic;
+  // Stream to deliver sensor data to external widgets (e.g. 3D Chart)
+  static final StreamController<SensorData> sensorDataStream =
+      StreamController<SensorData>.broadcast();
 
   @override
   State<StatefulWidget> createState() {
@@ -109,8 +113,23 @@ class _PeripheralDetailPageState extends State<PeripheralDetailPage> {
     DateTime? timestampDateTime = timestamp != null
         ? DateTime.fromMillisecondsSinceEpoch(timestamp)
         : null;
-    debugPrint('_handleValueChange ($timestampDateTime) $characteristicId, $s');
+    // debugPrint('_handleValueChange ($timestampDateTime) $characteristicId, $s');
     _addLog("Value", data);
+    Uint8List msg = value;
+
+    List<int> rawBytes = [];
+    for (int i = 4; i < msg.length; i++) {
+      rawBytes.add(msg[i]);
+    }
+    // print(rawBytes);
+
+    if (rawBytes.length == 12) {
+      final sensorData = SensorData.fromBytes(rawBytes);
+      PeripheralDetailPage.sensorDataStream.add(sensorData);
+
+      // print("Accel Z: ${sensorData.accZ.toStringAsFixed(2)} G");
+      // Pass 'sensorData' to your Chart or 3D Cube here
+    }
   }
 
   void _handlePairingStateChange(bool isPaired) {

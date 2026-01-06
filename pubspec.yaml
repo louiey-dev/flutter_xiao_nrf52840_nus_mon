@@ -51,6 +51,9 @@ dependencies:
   shared_preferences: ^2.5.4
   universal_ble: ^1.0.0
   device_preview: ^1.3.1
+  fl_chart: ^1.1.1
+  ditredi: ^2.0.2
+  vector_math: ^2.2.0
 
 dev_dependencies:
   flutter_test:

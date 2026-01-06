@@ -4,6 +4,8 @@ Window BLE utility for xiao nrf52840 kit.
 This is demo application with xiao_nrf52840_sense_peripheral_nus FW.
 Based code is from "flutter_xterm_uart_split_window"
 
+![main screen](screen.png)
+
 ## TODOs
 
 - ~~Split window set up~~
@@ -15,6 +17,7 @@ Based code is from "flutter_xterm_uart_split_window"
 - BLE basic connection feature
 - ~~universal_ble v1.0 apply~~
   - ~~some differences at code~~
+- ~~IMU data display at 3d chart~~
 
 ## History
 
@@ -29,6 +32,9 @@ Based code is from "flutter_xterm_uart_split_window"
   - universal_ble v1.0 applied and LED control works
   - Added API, _writeToBle, at ble menu tab and could use this for others
   - Display GAP/GATT string when prints service info
+- 2026.01.06
+  - IMU data displayed at 3d chart with car icon
+  - Need to subscribe notify service
 
 ## Info
 

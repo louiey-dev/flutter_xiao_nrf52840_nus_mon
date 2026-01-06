@@ -1,5 +1,7 @@
 // import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_xiao_nrf52840_nus_mon/screen/chart/chart3d_screen.dart';
+import 'package:flutter_xiao_nrf52840_nus_mon/screen/chart/chart_screen.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/universal_ble_win/ble_screen.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/tab_menu_screen.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/wifi/wifi_screen.dart';
@@ -46,7 +48,7 @@ class _MultiSplitViewScreenState extends State<MultiSplitViewScreen> {
               Area(
                 flex: 1,
                 builder: (context, area) =>
-                    Container(color: Colors.green, child: WiFiScreen()),
+                    Container(color: Colors.white24, child: Chart3dScreen()),
               ),
             ],
           ),

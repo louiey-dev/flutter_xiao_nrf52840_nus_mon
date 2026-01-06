@@ -81,6 +81,7 @@ class ServicesListWidget extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
+                        // 2026-01-02 18:14, Louiey. To display GAP/GATT string
                         // service.uuid,
                         service.uuid.contains('1800')
                             ? '${service.uuid} -- GAP'

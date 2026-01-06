@@ -35,6 +35,7 @@ Based code is from "flutter_xterm_uart_split_window"
 - 2026.01.06
   - IMU data displayed at 3d chart with car icon
   - Need to subscribe notify service
+  - bug fix : when app is closed without closing com port, it usually open fails when i open again. Added safe code and fixed this bug
 
 ## Info
 

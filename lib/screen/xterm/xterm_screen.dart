@@ -27,13 +27,14 @@ class XtermHome extends StatefulWidget {
   State<XtermHome> createState() => _XtermHomeState();
 }
 
-class _XtermHomeState extends State<XtermHome> {
+class _XtermHomeState extends State<XtermHome> with WidgetsBindingObserver {
   final FocusNode _focusNode = FocusNode();
   final bool _localEcho = false; // Toggle for local echo
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     terminal = Terminal(maxLines: 10000);
     terminal.write('\x1b[?12h');
   }
@@ -180,7 +181,15 @@ class _XtermHomeState extends State<XtermHome> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     mSp?.close();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      mSp?.close();
+    }
   }
 }

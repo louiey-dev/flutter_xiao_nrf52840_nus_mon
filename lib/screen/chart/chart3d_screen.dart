@@ -63,7 +63,7 @@ class _Chart3dScreenState extends State<Chart3dScreen> {
           );
 
           _currentVector = newPoint;
-          myUtils.log('Current Vector: $_currentVector');
+          // myUtils.log('Current Vector: $_currentVector');
           _history.add(newPoint);
           if (_history.length > _historyLimit) {
             _history.removeFirst();

@@ -54,6 +54,7 @@ dependencies:
   fl_chart: ^1.1.1
   ditredi: ^2.0.2
   vector_math: ^2.2.0
+  table_calendar: ^3.2.0
 
 dev_dependencies:
   flutter_test:

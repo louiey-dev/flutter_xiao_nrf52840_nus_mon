@@ -2,9 +2,13 @@ import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_xiao_nrf52840_nus_mon/feature/calendar.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/universal_ble_win/peripheral_details/peripheral_detail_page.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/utils.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/widget/my_widget.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:universal_ble/universal_ble.dart';
 
 class BleMenu extends StatefulWidget {
@@ -35,6 +39,8 @@ class _BleMenuState extends State<BleMenu> {
 
   TextEditingController prdController = TextEditingController();
 
+  TimeOfDay pickedTime = TimeOfDay.now();
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -60,7 +66,8 @@ class _BleMenuState extends State<BleMenu> {
                   setState(() {
                     _selectedLeds[index] = !_selectedLeds[index];
 
-                    String cmd = '00010006${index.toString().padLeft(2, '0')}';
+                    String cmd =
+                        '00010006${index.toRadixString(16).padLeft(2, '0')}';
                     cmd += _selectedLeds[index] ? '01' : '00';
                     _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
                   });
@@ -107,6 +114,138 @@ class _BleMenuState extends State<BleMenu> {
                   _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
                 },
                 child: const Text('Set'),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  String cmd = '00050004';
+                  _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+                },
+                child: const Text("RTC Get"),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  await initializeDateFormatting('ko_KR');
+                  final selectedDate = await showDialog<DateTime>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      DateTime? pickedDate;
+                      DateTime focusedDay = DateTime.now();
+                      // TimeOfDay pickedTime = TimeOfDay.now();
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          return AlertDialog(
+                            title: const Text('날짜 및 시간 선택'),
+                            content: SizedBox(
+                              width: double.maxFinite,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TableCalendar(
+                                    firstDay: DateTime(2020),
+                                    lastDay: DateTime(2030),
+                                    focusedDay: focusedDay,
+                                    headerStyle: const HeaderStyle(
+                                      formatButtonVisible: false,
+                                    ),
+                                    selectedDayPredicate: (day) =>
+                                        isSameDay(pickedDate, day),
+                                    onDaySelected: (selected, focused) {
+                                      setState(() {
+                                        pickedDate = selected;
+                                        focusedDay = focused;
+                                      });
+                                    },
+                                    locale: 'ko_KR',
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text(
+                                        '시간: ',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          final TimeOfDay? time =
+                                              await showTimePicker(
+                                                context: context,
+                                                initialTime: pickedTime,
+                                              );
+                                          if (time != null) {
+                                            setState(() {
+                                              pickedTime = time;
+                                            });
+                                          }
+                                        },
+                                        child: Text(
+                                          pickedTime.format(context),
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('취소'),
+                              ),
+                              TextButton(
+                                onPressed: pickedDate == null
+                                    ? null
+                                    : () {
+                                        final DateTime finalDateTime = DateTime(
+                                          pickedDate!.year,
+                                          pickedDate!.month,
+                                          pickedDate!.day,
+                                          pickedTime.hour,
+                                          pickedTime.minute,
+                                        );
+                                        Navigator.of(
+                                          context,
+                                        ).pop(finalDateTime);
+                                      },
+                                child: const Text('확인'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  );
+                  if (selectedDate != null) {
+                    myUtils.log(
+                      '선택된 날짜: ${DateFormat('yyyy-MM-dd HH:mm').format(selectedDate)}',
+                    );
+                    // send date time data to prepheral device
+                    List<int> m = [];
+                    m.add(selectedDate.year - 2000);
+                    m.add(selectedDate.month);
+                    m.add(selectedDate.day);
+                    m.add(selectedDate.weekday);
+                    m.add(selectedDate.hour);
+                    m.add(selectedDate.minute);
+                    m.add(0);
+                    String cmd =
+                        '00060009${m[0].toRadixString(16).padLeft(2, '0')}${m[1].toRadixString(16).padLeft(2, '0')}${m[2].toRadixString(16).padLeft(2, '0')}${m[3].toRadixString(16).padLeft(2, '0')}';
+                    cmd +=
+                        '${m[4].toRadixString(16).padLeft(2, '0')}${m[5].toRadixString(16).padLeft(2, '0')}${m[6].toRadixString(16).padLeft(2, '0')}';
+                    _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+                    myUtils.log(cmd);
+                  }
+                },
+                child: const Text("RTC Set"),
               ),
             ],
           ),

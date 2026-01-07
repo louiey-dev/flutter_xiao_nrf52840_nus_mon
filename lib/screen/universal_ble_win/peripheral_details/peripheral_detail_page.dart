@@ -4,8 +4,10 @@ import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_xiao_nrf52840_nus_mon/feature/ble_protocol.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/feature/sensor_data.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/universal_ble_win/peripheral_details/responsive_view.dart';
+import 'package:flutter_xiao_nrf52840_nus_mon/utils.dart';
 import 'package:universal_ble/universal_ble.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/universal_ble_win/data/storage_service.dart';
 import 'package:flutter_xiao_nrf52840_nus_mon/screen/universal_ble_win/peripheral_details/widgets/result_widget.dart';
@@ -115,21 +117,8 @@ class _PeripheralDetailPageState extends State<PeripheralDetailPage> {
         : null;
     // debugPrint('_handleValueChange ($timestampDateTime) $characteristicId, $s');
     _addLog("Value", data);
-    Uint8List msg = value;
 
-    List<int> rawBytes = [];
-    for (int i = 4; i < msg.length; i++) {
-      rawBytes.add(msg[i]);
-    }
-    // print(rawBytes);
-
-    if (rawBytes.length == 12) {
-      final sensorData = SensorData.fromBytes(rawBytes);
-      PeripheralDetailPage.sensorDataStream.add(sensorData);
-
-      // print("Accel Z: ${sensorData.accZ.toStringAsFixed(2)} G");
-      // Pass 'sensorData' to your Chart or 3D Cube here
-    }
+    _rcvMsgHandler(value);
   }
 
   void _handlePairingStateChange(bool isPaired) {
@@ -1526,5 +1515,37 @@ class _PeripheralDetailPageState extends State<PeripheralDetailPage> {
         });
       },
     );
+  }
+
+  _rcvMsgHandler(Uint8List msg) {
+    try {
+      int id = (msg[0] | msg[1] << 8);
+      int len = msg[2] | msg[3] << 8;
+
+      List<int> rawBytes = [];
+      for (int i = 4; i < msg.length; i++) {
+        rawBytes.add(msg[i]);
+      }
+
+      switch (id) {
+        case nusMsgNotifyImu:
+          final sensorData = SensorData.fromBytes(rawBytes);
+          PeripheralDetailPage.sensorDataStream.add(sensorData);
+          break;
+
+        case nusMsgNotifyRtc:
+          String date =
+              '20${rawBytes[0].toString().padLeft(2, '0')}-${rawBytes[1].toString().padLeft(2, '0')}-${rawBytes[2].toString().padLeft(2, '0')}-${rawBytes[3].toString().padLeft(2, '0')}-';
+          date +=
+              '${rawBytes[4].toString().padLeft(2, '0')}-${rawBytes[5].toString().padLeft(2, '0')}-${rawBytes[6].toString().padLeft(2, '0')}';
+          myUtils.log(date);
+          break;
+
+        default:
+          break;
+      }
+    } catch (e) {
+      myUtils.e(e.toString());
+    }
   }
 }

@@ -247,6 +247,8 @@ class _BleMenuState extends State<BleMenu> {
                 },
                 child: const Text("RTC Set"),
               ),
+              const SizedBox(width: 20),
+              _soundMenu(),
             ],
           ),
         ],
@@ -279,6 +281,83 @@ class _BleMenuState extends State<BleMenu> {
             _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
           },
           child: const Text("Set"),
+        ),
+      ],
+    );
+  }
+
+  _soundMenu() {
+    return Row(
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            String cmd = '00070008';
+            cmd += int.parse('262').toRadixString(16).padLeft(4, '0');
+            cmd += int.parse('500').toRadixString(16).padLeft(4, '0');
+            _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+            myUtils.log(cmd);
+          },
+          child: Text("DO"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            String cmd = '00070008';
+            cmd += int.parse('294').toRadixString(16).padLeft(4, '0');
+            cmd += int.parse('500').toRadixString(16).padLeft(4, '0');
+            _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+            myUtils.log(cmd);
+          },
+          child: Text("RE"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            String cmd = '00070008';
+            cmd += int.parse('330').toRadixString(16).padLeft(4, '0');
+            cmd += int.parse('500').toRadixString(16).padLeft(4, '0');
+            _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+            myUtils.log(cmd);
+          },
+          child: Text("MI"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            String cmd = '00070008';
+            cmd += int.parse('349').toRadixString(16).padLeft(4, '0');
+            cmd += int.parse('500').toRadixString(16).padLeft(4, '0');
+            _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+            myUtils.log(cmd);
+          },
+          child: Text("PA"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            String cmd = '00070008';
+            cmd += int.parse('392').toRadixString(16).padLeft(4, '0');
+            cmd += int.parse('500').toRadixString(16).padLeft(4, '0');
+            _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+            myUtils.log(cmd);
+          },
+          child: Text("SOL"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            String cmd = '00070008';
+            cmd += int.parse('440').toRadixString(16).padLeft(4, '0');
+            cmd += int.parse('500').toRadixString(16).padLeft(4, '0');
+            _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+            myUtils.log(cmd);
+          },
+          child: Text("RA"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            String cmd = '00070008';
+            cmd += int.parse('494').toRadixString(16).padLeft(4, '0');
+            cmd += int.parse('500').toRadixString(16).padLeft(4, '0');
+            _writeToBle(Uint8List.fromList(hex.decode(cmd)), false);
+            myUtils.log(cmd);
+          },
+          child: Text("SI"),
         ),
       ],
     );
